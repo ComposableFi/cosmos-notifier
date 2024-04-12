@@ -2,7 +2,6 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
 	"io"
 	"net/http"
 )
@@ -45,8 +44,6 @@ func fetchProposalsData(cosmosEndpoint string) (*ProposalsData, error) {
 		return nil, err
 	}
 	defer resp.Body.Close()
-
-	fmt.Println(resp)
 
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
