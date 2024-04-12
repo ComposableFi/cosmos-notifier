@@ -52,7 +52,6 @@ func main() {
 	if err != nil {
 		log.Errorf("Error parsing FETCH_INTERVAL: %s, defaulting to 1m\n", err)
 		interval = defaultInterval
-		return
 	}
 
 	var lastProposalId string
