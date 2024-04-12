@@ -23,7 +23,6 @@ func postToSlack(chainId string, proposal Proposal, slackWebookUrl string) error
 	payload := slack.Payload{
 		Text:        "Found new governance proposal",
 		Username:    "robot",
-		Channel:     "#test-channel",
 		IconEmoji:   ":monkey_face:",
 		Attachments: []slack.Attachment{attachment},
 	}
