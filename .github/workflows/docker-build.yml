@@ -32,20 +32,42 @@ jobs:
         username: ${{ github.repository_owner }}
         password: ${{ secrets.GITHUB_TOKEN }}
 
-    - name: Extract metadata (branch, tags, sha)
-      id: meta
-      uses: docker/metadata-action@v4
+    - name: Extract metadata (tags, labels) for Docker (tag)
+      id: meta-tag
+      if: github.ref_type == 'tag'
+      uses: docker/metadata-action@v5
       with:
         images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
         tags: |
-          type=raw,value=${{ github.ref_name }}-${{ github.run_id }}-${{ github.sha }}
-          type=semver,pattern=v*
+          type=semver,pattern={{version}}
+          type=semver,pattern={{major}}.{{minor}}
+          type=semver,pattern={{major}}
 
-    - name: Build and Push Docker Image
-      uses: docker/build-push-action@v3
+    - name: Extract metadata (tags, labels) for Docker (branch)
+      id: meta-branch
+      if: github.ref_type == 'branch'
+      uses: docker/metadata-action@v5
+      with:
+        images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+        tags: |
+          type=ref,event=branch
+          type=sha,prefix={{branch}}-{{date 'YYYYMMDDHHmmss'}}-
+
+    - name: Build and Push Docker Image (tag)
+      if: github.ref_type == 'tag'
+      uses: docker/build-push-action@v5
       with:
         context: .
         push: true
-        tags: ${{ steps.meta.outputs.tags }}
-        labels: ${{ steps.meta.outputs.labels }}
+        tags: ${{ steps.meta-tag.outputs.tags }}
+        labels: ${{ steps.meta-tag.outputs.labels }}
+
+    - name: Build and Push Docker Image (branch)
+      if: github.ref_type == 'branch'
+      uses: docker/build-push-action@v5
+      with:
+        context: .
+        push: true
+        tags: ${{ steps.meta-branch.outputs.tags }}
+        labels: ${{ steps.meta-branch.outputs.labels }}
 
