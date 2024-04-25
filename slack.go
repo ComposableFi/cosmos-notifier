@@ -4,7 +4,8 @@ import (
 	"github.com/ashwanthkumar/slack-go-webhook"
 )
 
-const proposalPrefixUrl = "https://explorer.stavr.tech/Composable-Testnet/gov/"
+const proposalPrefixTestnetUrl = "https://explorer.stavr.tech/Composable-Testnet/gov/"
+const proposalPrefixMainnetUrl = "https://explorer.stavr.tech/Composable-Mainnet/gov/"
 
 func postToSlack(chainId string, proposal Proposal, slackWebookUrl string) error {
 
@@ -18,7 +19,12 @@ func postToSlack(chainId string, proposal Proposal, slackWebookUrl string) error
 	attachment.AddField(slack.Field{Title: "VotingStartTime", Value: proposal.VotingStartTime})
 	attachment.AddField(slack.Field{Title: "VotingEndTime", Value: proposal.VotingEndTime})
 
-	attachment.AddAction(slack.Action{Type: "button", Text: "Open", Url: proposalPrefixUrl + proposal.ID, Style: "primary"})
+	switch chainId {
+	case "centauri-1":
+		attachment.AddAction(slack.Action{Type: "button", Text: "Open", Url: proposalPrefixMainnetUrl + proposal.ID, Style: "primary"})
+	case "banksy-testnet-5":
+		attachment.AddAction(slack.Action{Type: "button", Text: "Open", Url: proposalPrefixTestnetUrl + proposal.ID, Style: "primary"})
+	}
 
 	payload := slack.Payload{
 		Text:        "Found new governance proposal",
