@@ -55,6 +55,7 @@ func main() {
 	}
 
 	var lastProposalId string
+	firstIteration := true
 	for {
 		latestProposal, err := getLatestProposal(cosmosEndpoint)
 		if err != nil {
@@ -63,14 +64,16 @@ func main() {
 		}
 
 		// post to slack only if didn't posted before
-		if lastProposalId != latestProposal.ID {
+		if !firstIteration && lastProposalId != latestProposal.ID {
 			err = postToSlack(chainID, *latestProposal, slackWebhookURL)
 			if err != nil {
 				log.Errorf("Error posting to slack: %s\n", err)
 				continue
 			}
-			lastProposalId = latestProposal.ID
 		}
+
+		lastProposalId = latestProposal.ID
+		firstIteration = false
 
 		time.Sleep(interval)
 	}
