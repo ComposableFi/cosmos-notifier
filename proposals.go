@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"io"
 	"net/http"
 )
@@ -63,6 +64,9 @@ func getLatestProposal(cosmosEndpoint string) (*Proposal, error) {
 	proposalsData, err := fetchProposalsData(cosmosEndpoint)
 	if err != nil {
 		return nil, err
+	}
+	if len(proposalsData.Proposals) == 0 {
+		return nil, fmt.Errorf("no proposals found")
 	}
 	return &proposalsData.Proposals[0], nil
 }
